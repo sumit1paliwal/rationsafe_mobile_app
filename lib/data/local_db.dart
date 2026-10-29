@@ -124,15 +124,18 @@ class LocalDatabase {
   // --- Cards Cache ---
   Future<void> cacheCards(List<CardBeneficiary> cards) async {
     final db = await database;
-    final batch = db.batch();
-    for (final card in cards) {
-      batch.insert(
-        'local_cards',
-        card.toJson(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    }
-    await batch.commit(noResult: true);
+    await db.transaction((txn) async {
+      await txn.delete('local_cards');
+      final batch = txn.batch();
+      for (final card in cards) {
+        batch.insert(
+          'local_cards',
+          card.toJson(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+      await batch.commit(noResult: true);
+    });
   }
 
   Future<List<CardBeneficiary>> getLocalCards() async {
@@ -154,15 +157,18 @@ class LocalDatabase {
   // --- Lots Cache ---
   Future<void> cacheLots(List<GrainLotItem> lots) async {
     final db = await database;
-    final batch = db.batch();
-    for (final lot in lots) {
-      batch.insert(
-        'local_lots',
-        lot.toJson(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    }
-    await batch.commit(noResult: true);
+    await db.transaction((txn) async {
+      await txn.delete('local_lots');
+      final batch = txn.batch();
+      for (final lot in lots) {
+        batch.insert(
+          'local_lots',
+          lot.toJson(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+      await batch.commit(noResult: true);
+    });
   }
 
   Future<List<GrainLotItem>> getLocalLots() async {

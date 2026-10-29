@@ -85,10 +85,23 @@ class DispenseTab extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.bgSecondary,
                       borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.borderSubtle),
                     ),
-                    child: const Text(
-                      'No beneficiary cards enrolled yet. Please register a citizen.',
-                      style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.info_outline, size: 18, color: AppColors.amber400),
+                        const SizedBox(width: 10),
+                        const Expanded(
+                          child: Text(
+                            'No approved cards enrolled. Register and approve a citizen first.',
+                            style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => state.setActiveTab(1),
+                          child: const Text('Enroll', style: TextStyle(color: AppColors.cyan400, fontWeight: FontWeight.w700)),
+                        ),
+                      ],
                     ),
                   )
                 else
@@ -365,9 +378,34 @@ class DispenseTab extends StatelessWidget {
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
-                    onPressed: state.distLoading || activeCard.id.isEmpty
+                    onPressed: state.distLoading
                         ? null
-                        : () => state.executeDispense(),
+                        : () {
+                            if (activeCard.id.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('No active beneficiary card selected. Please enroll and approve a citizen first.'),
+                                  backgroundColor: AppColors.rose500,
+                                ),
+                              );
+                              return;
+                            }
+                            if (state.lots.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('No grain stockpile lots available. Ensure lots are seeded in the database.'),
+                                  backgroundColor: AppColors.rose500,
+                                ),
+                              );
+                              return;
+                            }
+                            state.executeDispense(
+                              cardId: activeCard.id,
+                              lotId: state.distLotId.isNotEmpty
+                                  ? state.distLotId
+                                  : (state.lots.isNotEmpty ? state.lots.first.id : ''),
+                            );
+                          },
                     child: state.distLoading
                         ? const SizedBox(
                             width: 20,

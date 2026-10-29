@@ -253,6 +253,14 @@ class GrainTrustRepository {
     return await _supabase.verifyRegistration(regId);
   }
 
+  Future<bool> deleteRegistration(String regId) async {
+    return await _supabase.deleteRegistration(regId);
+  }
+
+  Future<bool> clearUnapprovedRegistrations() async {
+    return await _supabase.clearUnapprovedRegistrations();
+  }
+
   Future<Map<String, dynamic>> approveRegistration(String regId) async {
     return await _supabase.approveRegistration(regId);
   }

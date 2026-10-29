@@ -44,32 +44,39 @@ class EdgeSyncTab extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.cyan400.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(8),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppColors.cyan400.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.sync_alt_rounded, size: 20, color: AppColors.cyan400),
                           ),
-                          child: const Icon(Icons.sync_alt_rounded, size: 20, color: AppColors.cyan400),
-                        ),
-                        const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              activeNode.name,
-                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  activeNode.name,
+                                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  'Terminal ID: ${activeNode.id}',
+                                  style: const TextStyle(color: AppColors.textDim, fontSize: 11),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
                             ),
-                            Text(
-                              'Terminal ID: ${activeNode.id}',
-                              style: const TextStyle(color: AppColors.textDim, fontSize: 11),
-                            ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 10),
                     GlowingBadge(
                       label: state.isOnline ? 'ONLINE' : 'OFFLINE',
                       color: state.isOnline ? AppColors.emerald400 : AppColors.rose400,
@@ -83,38 +90,44 @@ class EdgeSyncTab extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'PENDING OUTBOX DEPTH',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.8,
-                            color: AppColors.textDim,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'PENDING OUTBOX DEPTH',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.8,
+                              color: AppColors.textDim,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Text(
-                              '${state.outboxDepth}',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w900,
-                                color: state.outboxDepth > 0 ? AppColors.amber400 : AppColors.emerald400,
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Text(
+                                '${state.outboxDepth}',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w900,
+                                  color: state.outboxDepth > 0 ? AppColors.amber400 : AppColors.emerald400,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              state.outboxDepth == 1 ? 'provisional token queued' : 'provisional tokens queued',
-                              style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      ],
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  state.outboxDepth == 1 ? 'token queued' : 'tokens queued',
+                                  style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     GlowingBadge(
                       label: state.outboxDepth > 0 ? 'SYNC REQUIRED' : 'UP TO DATE',
                       color: state.outboxDepth > 0 ? AppColors.amber400 : AppColors.emerald400,
@@ -221,14 +234,18 @@ class EdgeSyncTab extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          node.name,
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            color: isSelected ? AppColors.cyan400 : AppColors.textMain,
+                        Expanded(
+                          child: Text(
+                            node.name,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                              color: isSelected ? AppColors.cyan400 : AppColors.textMain,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                        const SizedBox(width: 8),
                         GlowingBadge(
                           label: node.status,
                           color: node.isOnline ? AppColors.emerald400 : AppColors.rose400,

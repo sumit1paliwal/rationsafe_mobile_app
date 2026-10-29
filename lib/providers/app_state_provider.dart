@@ -143,6 +143,8 @@ class AppStateProvider extends ChangeNotifier {
       // Lot Selection Preservation
       if (_distLotId.isEmpty && _lots.isNotEmpty) {
         _distLotId = _lots.first.id;
+      } else if (!_lots.any((l) => l.id == _distLotId) && _lots.isNotEmpty) {
+        _distLotId = _lots.first.id;
       }
 
       notifyListeners();
@@ -197,8 +199,26 @@ class AppStateProvider extends ChangeNotifier {
   // --- Actions ---
 
   /// Execute Grain Dispense (Online vs Offline)
-  Future<void> executeDispense() async {
-    if (_selectedCardId.isEmpty || _distLotId.isEmpty) return;
+  Future<void> executeDispense({String? cardId, String? lotId}) async {
+    final effectiveCardId = (cardId != null && cardId.isNotEmpty)
+        ? cardId
+        : (_selectedCardId.isNotEmpty
+            ? _selectedCardId
+            : (_cards.isNotEmpty ? _cards.first.id : ''));
+
+    final effectiveLotId = (lotId != null && lotId.isNotEmpty)
+        ? lotId
+        : (_distLotId.isNotEmpty
+            ? _distLotId
+            : (_lots.isNotEmpty ? _lots.first.id : ''));
+
+    if (effectiveCardId.isEmpty || effectiveLotId.isEmpty) {
+      debugPrint('[AppStateProvider] executeDispense failed: card ($effectiveCardId) or lot ($effectiveLotId) is empty');
+      return;
+    }
+
+    _selectedCardId = effectiveCardId;
+    _distLotId = effectiveLotId;
 
     _distLoading = true;
     _distCurrentState = 'ATTEMPT';
@@ -208,8 +228,8 @@ class AppStateProvider extends ChangeNotifier {
     try {
       final res = await _repo.issueGrain(
         isOnline: _isOnline,
-        cardId: _selectedCardId,
-        lotId: _distLotId,
+        cardId: effectiveCardId,
+        lotId: effectiveLotId,
         nodeId: _selectedNodeId,
         quantity: _distQuantity,
         allowFallback: _distAllowFallback,
@@ -297,7 +317,22 @@ class AppStateProvider extends ChangeNotifier {
       // Switch to Dispense tab
       _activeTabIndex = 0;
       notifyListeners();
+    } else {
+      _regErrorMsg = res['message'] ?? 'Failed to approve registration and issue card.';
+      notifyListeners();
     }
+  }
+
+  /// Delete a single registration
+  Future<void> deleteRegistration(String regId) async {
+    await _repo.deleteRegistration(regId);
+    await loadAllData();
+  }
+
+  /// Delete all unapproved registrations (cleanup duplicates)
+  Future<void> clearUnapprovedRegistrations() async {
+    await _repo.clearUnapprovedRegistrations();
+    await loadAllData();
   }
 
   /// Reset Database
